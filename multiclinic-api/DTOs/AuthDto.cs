@@ -19,4 +19,7 @@ public class LoginResponse
     public string Token { get; set; } = string.Empty;
     public string Nome { get; set; } = string.Empty;
     public string Tipo_Perfil { get; set; } = string.Empty;
+    public int ID_Usuario { get; set; }
+    public int? ID_Paciente { get; set; }
+    public int? ID_Medico { get; set; }
 }

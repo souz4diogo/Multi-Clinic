@@ -2,7 +2,6 @@ namespace MultiClinicAPI.DTOs;
 
 public class PacienteRequest
 {
-    public int ID_Usuario { get; set; }
     public string CPF { get; set; } = string.Empty;
     public DateTime Data_Nascimento { get; set; }
 }

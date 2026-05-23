@@ -9,9 +9,16 @@ export function AuthProvider({ children }) {
   });
 
   function login(dados) {
+    const perfil = {
+      nome: dados.nome,
+      tipo_Perfil: dados.tipo_Perfil,
+      id_Usuario: dados.iD_Usuario,
+      id_Paciente: dados.iD_Paciente ?? null,
+      id_Medico: dados.iD_Medico ?? null,
+    };
     localStorage.setItem('token', dados.token);
-    localStorage.setItem('usuario', JSON.stringify({ nome: dados.nome, tipo_Perfil: dados.tipo_Perfil }));
-    setUsuario({ nome: dados.nome, tipo_Perfil: dados.tipo_Perfil });
+    localStorage.setItem('usuario', JSON.stringify(perfil));
+    setUsuario(perfil);
   }
 
   function logout() {

@@ -41,6 +41,7 @@ public class EspecialidadeController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "MedicoAdmin")]
     public async Task<IActionResult> Criar([FromBody] EspecialidadeRequest request)
     {
         var especialidade = new Especialidade
@@ -55,6 +56,7 @@ public class EspecialidadeController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "MedicoAdmin")]
     public async Task<IActionResult> Deletar(int id)
     {
         var especialidade = await _context.Especialidades.FindAsync(id);

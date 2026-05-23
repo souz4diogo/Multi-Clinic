@@ -18,4 +18,6 @@ public class Agendamento
     public Medico Medico { get; set; } = null!;
 
     public Prontuario? Prontuario { get; set; }
+
+    public Avaliacao? Avaliacao { get; set; }
 }

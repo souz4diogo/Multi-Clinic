@@ -1,20 +1,10 @@
-﻿namespace MultiClinicAPI.Models;
+namespace MultiClinicAPI.Models;
 
-public class Medico
+public class Medico : Usuario
 {
-    public int ID_Medico { get; set; }
-
-    public int ID_Usuario { get; set; }
-
     public int ID_Especialidade { get; set; }
-
     public string CRM { get; set; } = string.Empty;
 
-    // Relacionamentos
-    public Usuario Usuario { get; set; } = null!;
-
     public Especialidade Especialidade { get; set; } = null!;
-
-    public ICollection<Agendamento> Agendamentos { get; set; }
-        = new List<Agendamento>();
+    public ICollection<Agendamento> Agendamentos { get; set; } = new List<Agendamento>();
 }

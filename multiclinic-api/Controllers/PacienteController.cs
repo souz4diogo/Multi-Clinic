@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MultiClinicAPI.Data;
 using MultiClinicAPI.DTOs;
-using MultiClinicAPI.Models;
+using System.Security.Claims;
 
 namespace MultiClinicAPI.Controllers;
 
@@ -22,53 +22,39 @@ public class PacienteController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Listar()
     {
-        var pacientes = await QueryComIncludes()
-            .ToListAsync();
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var role = User.FindFirstValue(ClaimTypes.Role);
 
-        return Ok(pacientes.Select(p => ToResponse(p)));
+        IQueryable<Models.Paciente> query = _context.Pacientes;
+
+        if (role == "Paciente")
+            query = query.Where(p => p.ID_Usuario == userId);
+
+        var pacientes = await query.ToListAsync();
+        return Ok(pacientes.Select(ToResponse));
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> BuscarPorId(int id)
+    [HttpPut("perfil")]
+    [Authorize(Roles = "Paciente")]
+    public async Task<IActionResult> AtualizarPerfil([FromBody] PacienteRequest request)
     {
-        var paciente = await QueryComIncludes()
-            .FirstOrDefaultAsync(p => p.ID_Paciente == id);
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
+        var paciente = await _context.Pacientes.FindAsync(userId);
         if (paciente == null)
             return NotFound("Paciente não encontrado.");
+
+        paciente.CPF = request.CPF;
+        paciente.Data_Nascimento = request.Data_Nascimento;
+        await _context.SaveChangesAsync();
 
         return Ok(ToResponse(paciente));
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Criar([FromBody] PacienteRequest request)
+    private static PacienteResponse ToResponse(Models.Paciente p) => new()
     {
-        var usuarioExiste = await _context.Usuarios.AnyAsync(u => u.ID_Usuario == request.ID_Usuario);
-
-        if (!usuarioExiste)
-            return BadRequest("Usuário não encontrado.");
-
-        var paciente = new Paciente
-        {
-            ID_Usuario = request.ID_Usuario,
-            CPF = request.CPF,
-            Data_Nascimento = request.Data_Nascimento,
-            Score_Assiduidade = 0
-        };
-
-        _context.Pacientes.Add(paciente);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(BuscarPorId), new { id = paciente.ID_Paciente }, paciente.ID_Paciente);
-    }
-
-    private IQueryable<Paciente> QueryComIncludes() =>
-        _context.Pacientes.Include(p => p.Usuario);
-
-    private static PacienteResponse ToResponse(Paciente p) => new()
-    {
-        ID_Paciente = p.ID_Paciente,
-        Nome = p.Usuario.Nome,
+        ID_Paciente = p.ID_Usuario,
+        Nome = p.Nome,
         CPF = p.CPF,
         Data_Nascimento = p.Data_Nascimento,
         Score_Assiduidade = p.Score_Assiduidade

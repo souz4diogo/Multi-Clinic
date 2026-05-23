@@ -13,4 +13,7 @@ public class ProntuarioResponse
     public int ID_Agendamento { get; set; }
     public string? Evolucao_Clinica { get; set; }
     public string? Prescricao { get; set; }
+    public string NomePaciente { get; set; } = string.Empty;
+    public string NomeMedico { get; set; } = string.Empty;
+    public DateTime Data_Hora { get; set; }
 }
