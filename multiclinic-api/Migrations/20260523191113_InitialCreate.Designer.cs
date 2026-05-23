@@ -12,8 +12,8 @@ using MultiClinicAPI.Data;
 namespace multiclinic_api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260523150838_AdicionarAvaliacoes")]
-    partial class AdicionarAvaliacoes
+    [Migration("20260523191113_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -94,64 +94,6 @@ namespace multiclinic_api.Migrations
                     b.ToTable("Especialidades");
                 });
 
-            modelBuilder.Entity("MultiClinicAPI.Models.Medico", b =>
-                {
-                    b.Property<int>("ID_Medico")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_Medico"));
-
-                    b.Property<string>("CRM")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ID_Especialidade")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ID_Usuario")
-                        .HasColumnType("int");
-
-                    b.HasKey("ID_Medico");
-
-                    b.HasIndex("ID_Especialidade");
-
-                    b.HasIndex("ID_Usuario")
-                        .IsUnique();
-
-                    b.ToTable("Medicos");
-                });
-
-            modelBuilder.Entity("MultiClinicAPI.Models.Paciente", b =>
-                {
-                    b.Property<int>("ID_Paciente")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_Paciente"));
-
-                    b.Property<string>("CPF")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Data_Nascimento")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ID_Usuario")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Score_Assiduidade")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.HasKey("ID_Paciente");
-
-                    b.HasIndex("ID_Usuario")
-                        .IsUnique();
-
-                    b.ToTable("Pacientes");
-                });
-
             modelBuilder.Entity("MultiClinicAPI.Models.Prontuario", b =>
                 {
                     b.Property<int>("ID_Prontuario")
@@ -204,6 +146,42 @@ namespace multiclinic_api.Migrations
                     b.HasKey("ID_Usuario");
 
                     b.ToTable("Usuarios");
+
+                    b.UseTptMappingStrategy();
+                });
+
+            modelBuilder.Entity("MultiClinicAPI.Models.Medico", b =>
+                {
+                    b.HasBaseType("MultiClinicAPI.Models.Usuario");
+
+                    b.Property<string>("CRM")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ID_Especialidade")
+                        .HasColumnType("int");
+
+                    b.HasIndex("ID_Especialidade");
+
+                    b.ToTable("Medicos", (string)null);
+                });
+
+            modelBuilder.Entity("MultiClinicAPI.Models.Paciente", b =>
+                {
+                    b.HasBaseType("MultiClinicAPI.Models.Usuario");
+
+                    b.Property<string>("CPF")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Data_Nascimento")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Score_Assiduidade")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.ToTable("Pacientes", (string)null);
                 });
 
             modelBuilder.Entity("MultiClinicAPI.Models.Agendamento", b =>
@@ -236,36 +214,6 @@ namespace multiclinic_api.Migrations
                     b.Navigation("Agendamento");
                 });
 
-            modelBuilder.Entity("MultiClinicAPI.Models.Medico", b =>
-                {
-                    b.HasOne("MultiClinicAPI.Models.Especialidade", "Especialidade")
-                        .WithMany("Medicos")
-                        .HasForeignKey("ID_Especialidade")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MultiClinicAPI.Models.Usuario", "Usuario")
-                        .WithOne("Medico")
-                        .HasForeignKey("MultiClinicAPI.Models.Medico", "ID_Usuario")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Especialidade");
-
-                    b.Navigation("Usuario");
-                });
-
-            modelBuilder.Entity("MultiClinicAPI.Models.Paciente", b =>
-                {
-                    b.HasOne("MultiClinicAPI.Models.Usuario", "Usuario")
-                        .WithOne("Paciente")
-                        .HasForeignKey("MultiClinicAPI.Models.Paciente", "ID_Usuario")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Usuario");
-                });
-
             modelBuilder.Entity("MultiClinicAPI.Models.Prontuario", b =>
                 {
                     b.HasOne("MultiClinicAPI.Models.Agendamento", "Agendamento")
@@ -275,6 +223,32 @@ namespace multiclinic_api.Migrations
                         .IsRequired();
 
                     b.Navigation("Agendamento");
+                });
+
+            modelBuilder.Entity("MultiClinicAPI.Models.Medico", b =>
+                {
+                    b.HasOne("MultiClinicAPI.Models.Especialidade", "Especialidade")
+                        .WithMany("Medicos")
+                        .HasForeignKey("ID_Especialidade")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MultiClinicAPI.Models.Usuario", null)
+                        .WithOne()
+                        .HasForeignKey("MultiClinicAPI.Models.Medico", "ID_Usuario")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Especialidade");
+                });
+
+            modelBuilder.Entity("MultiClinicAPI.Models.Paciente", b =>
+                {
+                    b.HasOne("MultiClinicAPI.Models.Usuario", null)
+                        .WithOne()
+                        .HasForeignKey("MultiClinicAPI.Models.Paciente", "ID_Usuario")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MultiClinicAPI.Models.Agendamento", b =>
@@ -297,13 +271,6 @@ namespace multiclinic_api.Migrations
             modelBuilder.Entity("MultiClinicAPI.Models.Paciente", b =>
                 {
                     b.Navigation("Agendamentos");
-                });
-
-            modelBuilder.Entity("MultiClinicAPI.Models.Usuario", b =>
-                {
-                    b.Navigation("Medico");
-
-                    b.Navigation("Paciente");
                 });
 #pragma warning restore 612, 618
         }

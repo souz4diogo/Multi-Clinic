@@ -40,6 +40,10 @@ public class PacienteController : ControllerBase
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
+        var cpfEmUso = await _context.Pacientes.AnyAsync(p => p.CPF == request.CPF && p.ID_Usuario != userId);
+        if (cpfEmUso)
+            return BadRequest("CPF já cadastrado.");
+
         var paciente = await _context.Pacientes.FindAsync(userId);
         if (paciente == null)
             return NotFound("Paciente não encontrado.");

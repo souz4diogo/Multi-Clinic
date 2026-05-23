@@ -19,6 +19,7 @@ public class RelatorioController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "MedicoAdmin")]
     public async Task<IActionResult> Gerar()
     {
         // Totais gerais

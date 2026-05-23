@@ -18,6 +18,7 @@ public class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Herança: Paciente e Medico são tabelas separadas que estendem Usuarios (TPT)
+        modelBuilder.Entity<Usuario>().HasKey(u => u.ID_Usuario);
         modelBuilder.Entity<Paciente>().ToTable("Pacientes");
         modelBuilder.Entity<Medico>().ToTable("Medicos");
 

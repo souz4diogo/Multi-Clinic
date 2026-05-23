@@ -64,6 +64,10 @@ public class EspecialidadeController : ControllerBase
         if (especialidade == null)
             return NotFound("Especialidade não encontrada.");
 
+        var temMedicos = await _context.Medicos.AnyAsync(m => m.ID_Especialidade == id);
+        if (temMedicos)
+            return BadRequest("Não é possível excluir uma especialidade com médicos cadastrados.");
+
         _context.Especialidades.Remove(especialidade);
         await _context.SaveChangesAsync();
 

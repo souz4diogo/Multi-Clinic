@@ -44,15 +44,13 @@ namespace multiclinic_api.Migrations
                 name: "Medicos",
                 columns: table => new
                 {
-                    ID_Medico = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
                     ID_Usuario = table.Column<int>(type: "int", nullable: false),
                     ID_Especialidade = table.Column<int>(type: "int", nullable: false),
                     CRM = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Medicos", x => x.ID_Medico);
+                    table.PrimaryKey("PK_Medicos", x => x.ID_Usuario);
                     table.ForeignKey(
                         name: "FK_Medicos_Especialidades_ID_Especialidade",
                         column: x => x.ID_Especialidade,
@@ -64,15 +62,13 @@ namespace multiclinic_api.Migrations
                         column: x => x.ID_Usuario,
                         principalTable: "Usuarios",
                         principalColumn: "ID_Usuario",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Pacientes",
                 columns: table => new
                 {
-                    ID_Paciente = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
                     ID_Usuario = table.Column<int>(type: "int", nullable: false),
                     CPF = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Data_Nascimento = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -80,13 +76,13 @@ namespace multiclinic_api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Pacientes", x => x.ID_Paciente);
+                    table.PrimaryKey("PK_Pacientes", x => x.ID_Usuario);
                     table.ForeignKey(
                         name: "FK_Pacientes_Usuarios_ID_Usuario",
                         column: x => x.ID_Usuario,
                         principalTable: "Usuarios",
                         principalColumn: "ID_Usuario",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -107,13 +103,33 @@ namespace multiclinic_api.Migrations
                         name: "FK_Agendamentos_Medicos_ID_Medico",
                         column: x => x.ID_Medico,
                         principalTable: "Medicos",
-                        principalColumn: "ID_Medico",
+                        principalColumn: "ID_Usuario",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Agendamentos_Pacientes_ID_Paciente",
                         column: x => x.ID_Paciente,
                         principalTable: "Pacientes",
-                        principalColumn: "ID_Paciente",
+                        principalColumn: "ID_Usuario",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Avaliacoes",
+                columns: table => new
+                {
+                    ID_Avaliacao = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ID_Agendamento = table.Column<int>(type: "int", nullable: false),
+                    Nota = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Avaliacoes", x => x.ID_Avaliacao);
+                    table.ForeignKey(
+                        name: "FK_Avaliacoes_Agendamentos_ID_Agendamento",
+                        column: x => x.ID_Agendamento,
+                        principalTable: "Agendamentos",
+                        principalColumn: "ID_Agendamento",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -149,21 +165,15 @@ namespace multiclinic_api.Migrations
                 column: "ID_Paciente");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Avaliacoes_ID_Agendamento",
+                table: "Avaliacoes",
+                column: "ID_Agendamento",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Medicos_ID_Especialidade",
                 table: "Medicos",
                 column: "ID_Especialidade");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Medicos_ID_Usuario",
-                table: "Medicos",
-                column: "ID_Usuario",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Pacientes_ID_Usuario",
-                table: "Pacientes",
-                column: "ID_Usuario",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Prontuarios_ID_Agendamento",
@@ -175,6 +185,9 @@ namespace multiclinic_api.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Avaliacoes");
+
             migrationBuilder.DropTable(
                 name: "Prontuarios");
 

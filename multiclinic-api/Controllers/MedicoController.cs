@@ -59,6 +59,10 @@ public class MedicoController : ControllerBase
         if (emailEmUso)
             return BadRequest("E-mail já cadastrado.");
 
+        var crmEmUso = await _context.Medicos.AnyAsync(m => m.CRM == request.CRM);
+        if (crmEmUso)
+            return BadRequest("CRM já cadastrado.");
+
         var especialidadeExiste = await _context.Especialidades.AnyAsync(e => e.ID_Especialidade == request.ID_Especialidade);
         if (!especialidadeExiste)
             return BadRequest("Especialidade não encontrada.");

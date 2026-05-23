@@ -41,9 +41,17 @@ public class AgendamentoController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> BuscarPorId(int id)
     {
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var role = User.FindFirstValue(ClaimTypes.Role);
+
         var agendamento = await QueryComIncludes().FirstOrDefaultAsync(a => a.ID_Agendamento == id);
         if (agendamento == null)
             return NotFound("Agendamento não encontrado.");
+
+        if (role == "Paciente" && agendamento.ID_Paciente != userId)
+            return Forbid();
+        if (role == "Medico" && agendamento.ID_Medico != userId)
+            return Forbid();
 
         return Ok(ToResponse(agendamento));
     }
@@ -73,6 +81,9 @@ public class AgendamentoController : ControllerBase
         if (!medicoExiste)
             return BadRequest("Médico não encontrado.");
 
+        if (request.Data_Hora <= DateTime.Now)
+            return BadRequest("A data do agendamento deve ser futura.");
+
         var agendamento = new Agendamento
         {
             ID_Paciente = request.ID_Paciente,
@@ -100,6 +111,10 @@ public class AgendamentoController : ControllerBase
 
         if (role == "Medico" && agendamento.ID_Medico != userId)
             return Forbid();
+
+        var statusValidos = new[] { "Agendado", "Concluido", "Cancelado" };
+        if (!statusValidos.Contains(request.Status))
+            return BadRequest("Status inválido. Use: Agendado, Concluido ou Cancelado.");
 
         agendamento.Status = request.Status;
         await _context.SaveChangesAsync();
