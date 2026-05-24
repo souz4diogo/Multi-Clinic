@@ -22,6 +22,11 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Paciente>().ToTable("Pacientes");
         modelBuilder.Entity<Medico>().ToTable("Medicos");
 
+        // Unicidade garantida no banco (não apenas na aplicação)
+        modelBuilder.Entity<Usuario>().HasIndex(u => u.Email).IsUnique();
+        modelBuilder.Entity<Medico>().HasIndex(m => m.CRM).IsUnique();
+        modelBuilder.Entity<Paciente>().HasIndex(p => p.CPF).IsUnique();
+
         modelBuilder.Entity<Paciente>()
             .Property(p => p.Score_Assiduidade)
             .HasPrecision(5, 2);
