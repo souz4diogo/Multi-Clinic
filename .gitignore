@@ -427,3 +427,37 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# ============================================================
+# React + Vite (multiclinic-web)
+# ============================================================
+dist/
+dist-ssr/
+.vite/
+.eslintcache
+*.local
+
+# ============================================================
+# Variáveis de ambiente
+# ============================================================
+.env
+.env.*
+!.env.example
+
+# ============================================================
+# ASP.NET Core – configurações locais com secrets
+# ============================================================
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.local.json
+
+# ============================================================
+# Sistema Operacional – Windows
+# ============================================================
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Academico / Relatorios
+regras pim.txt
+RELATORIO_*.md
