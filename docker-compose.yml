@@ -1,0 +1,41 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      SA_PASSWORD: "MultiClinic@2026!"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqldata:/var/opt/mssql
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo >/dev/tcp/127.0.0.1/1433"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 15s
+
+  api:
+    build:
+      context: ./multiclinic-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ConnectionStrings__DefaultConnection=Server=db;Database=MultiClinicDB;User Id=sa;Password=MultiClinic@2026!;TrustServerCertificate=True;
+    ports:
+      - "5081:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./multiclinic-web
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+
+volumes:
+  sqldata:
