@@ -461,3 +461,6 @@ $RECYCLE.BIN/
 # Academico / Relatorios
 regras pim.txt
 RELATORIO_*.md
+
+# Claude Code
+.claude/
