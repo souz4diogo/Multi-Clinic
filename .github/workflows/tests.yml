@@ -1,0 +1,51 @@
+name: Tests
+
+on:
+  push:
+    branches: [main, developer]
+  pull_request:
+    branches: [main, developer]
+
+jobs:
+  backend:
+    name: Backend (xUnit)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore multiclinic-api.Tests/multiclinic-api.Tests.csproj
+
+      - name: Build
+        run: dotnet build multiclinic-api.Tests/multiclinic-api.Tests.csproj --no-restore --configuration Release
+
+      - name: Run tests
+        run: dotnet test multiclinic-api.Tests/multiclinic-api.Tests.csproj --no-build --configuration Release --verbosity normal
+
+  frontend:
+    name: Frontend (Vitest)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: multiclinic-web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: multiclinic-web
+
+      - name: Run tests
+        run: npm test
+        working-directory: multiclinic-web

@@ -22,7 +22,7 @@ export default function Register() {
     setCarregando(true)
     try {
       const { data } = await api.post("/auth/registrar", form)
-      setSucesso(`Conta criada com sucesso! Seu ID é ${data.iD_Usuario}.`)
+      setSucesso("Conta criada com sucesso!")
       setForm({ nome: "", email: "", senha: "", tipo_Perfil: "Paciente" })
     } catch (err) {
       setErro(err.response?.data || "Erro ao cadastrar. Tente novamente.")

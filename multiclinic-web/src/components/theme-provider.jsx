@@ -24,7 +24,9 @@ export function ThemeProvider({ children, defaultTheme = 'system', storageKey = 
     root.classList.add(resolved)
   }, [])
 
-  
+  useEffect(() => {
+    applyTheme(theme)
+  }, [theme, applyTheme])
 
   const value = useMemo(() => ({ theme, setTheme }), [theme, setTheme])
 

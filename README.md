@@ -1,5 +1,7 @@
 # MultiClinic
 
+![Tests](https://github.com/souz4diogo/Multi-Clinic/actions/workflows/tests.yml/badge.svg)
+
 Sistema de gestão clínica full stack com autenticação JWT, controle de acesso por papéis (RBAC) e dashboard analítico em tempo real. Desenvolvido com ASP.NET Core (.NET 10) no back-end e React no front-end, containerizado com Docker Compose.
 
 ---
@@ -13,8 +15,8 @@ Sistema de gestão clínica full stack com autenticação JWT, controle de acess
 - Swagger / OpenAPI
 
 **Front-end**
-- React 18 + Vite
-- React Router v6 com rotas protegidas por perfil
+- React 19 + Vite 8
+- React Router v7 com rotas protegidas por perfil
 - Tailwind CSS + shadcn/ui
 - Lucide React
 
@@ -22,6 +24,12 @@ Sistema de gestão clínica full stack com autenticação JWT, controle de acess
 - Docker Compose — 3 containers (SQL Server, API, Nginx)
 - Migrations automáticas na inicialização
 - Healthcheck no banco antes de subir a API
+
+**Testes**
+- xUnit + EF Core InMemory — 34 testes unitários no back-end
+- Vitest 3 + React Testing Library — 20 testes unitários no front-end
+- Cobertura mínima de 80% das regras de negócio críticas
+- GitHub Actions — execução automática a cada push e pull request
 
 ---
 
@@ -68,6 +76,43 @@ Cada endpoint valida o `ClaimTypes.Role` do JWT e retorna `403 Forbidden` quando
 │  após o SQL Server estar pronto                  │
 └─────────────────────────────────────────────────┘
 ```
+
+---
+
+## Testes
+
+A suite cobre os controllers REST, serviços de autenticação, regras de negócio e componentes de front-end com **mínimo de 80% das regras críticas testadas**.
+
+### Back-end — xUnit (34 testes)
+
+| Suite | Casos cobertos |
+|---|---|
+| `TokenServiceTests` | Geração de JWT, claims, expiração de 8h, todas as roles |
+| `AuthControllerTests` | Registro (e-mail novo/duplicado), login (sucesso/e-mail errado/senha errada) |
+| `AgendamentoControllerTests` | Listagem por perfil (Admin/Paciente/Médico), criação, validação de data, CPF obrigatório, atualização de status |
+| `EspecialidadeControllerTests` | CRUD completo, bloqueio de exclusão com médicos vinculados |
+| `AvaliacaoControllerTests` | Nota fora do intervalo, consulta não concluída, avaliação duplicada, propriedade do agendamento |
+| `RelatorioControllerTests` | KPIs com BD vazio, contagens corretas, taxa de cancelamento |
+
+```bash
+cd multiclinic-api.Tests
+dotnet test
+```
+
+### Front-end — Vitest (20 testes)
+
+| Suite | Casos cobertos |
+|---|---|
+| `AuthContext` | Estado inicial, login persiste token/perfil no localStorage, logout limpa estado, restauração ao montar |
+| `PrivateRoute` | Redireciona sem autenticação, renderiza com role autorizada, bloqueia role não autorizada, múltiplas roles |
+| `api.js` | Interceptor adiciona Bearer token, omite header sem token, limpa localStorage e redireciona em 401 |
+
+```bash
+cd multiclinic-web
+npm test
+```
+
+> Os testes também rodam automaticamente via **GitHub Actions** a cada push e pull request para `main` ou `developer` — veja `.github/workflows/tests.yml`.
 
 ---
 
@@ -141,12 +186,18 @@ Multi-Clinic/
 │   ├── Data/                  # AppDbContext + Migrations
 │   └── Dockerfile
 │
+├── multiclinic-api.Tests/     # xUnit — 34 testes unitários
+│   ├── Controllers/           # Testes dos controllers com InMemory DB
+│   ├── Services/              # Testes do TokenService
+│   └── Helpers/               # Factories para contexto e banco de teste
+│
 ├── multiclinic-web/           # React + Vite
 │   └── src/
 │       ├── pages/             # Dashboard, Agendamentos, Pacientes...
 │       ├── components/        # Navbar, PrivateRoute
 │       ├── context/           # AuthContext (JWT decode + proteção de rotas)
-│       └── services/          # Axios com interceptor de token
+│       ├── services/          # Axios com interceptor de token
+│       └── __tests__/         # Vitest — 20 testes unitários
 │
 └── docker-compose.yml
 ```
